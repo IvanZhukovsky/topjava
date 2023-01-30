@@ -10,6 +10,9 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summingInt;
+
 public class UserMealsUtil {
     public static void main(String[] args) {
         List<UserMeal> meals = Arrays.asList(
@@ -45,7 +48,7 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesAtDates = meals.stream()
-                .collect(Collectors.groupingBy(UserMeal::getDate, Collectors.summingInt(UserMeal::getCalories)));
+                .collect(Collectors.groupingBy(UserMeal::getDate, summingInt(UserMeal::getCalories)));
         return meals.stream()
                 .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
                 .map(meal -> convertToUserMealWithExcess(meal, caloriesAtDates.get(meal.getDate()) > caloriesPerDay))
