@@ -21,14 +21,10 @@
     </tr>
     <c:forEach items="${mealsTo}" var="mealTo">
         <jsp:useBean id="mealTo" type="ru.javawebinar.topjava.model.MealTo "/>
-        <%if (mealTo.isExcess()) {%>
-        <tr style="color:red;">
-        <%} else {%>
-        <tr style="color:green;">
-        <%}%>
-            <td><%=mealTo.getDate()%> <%=mealTo.getTime()%></td>
-            <td><%=mealTo.getDescription()%></td>
-            <td><%=mealTo.getCalories()%></td>
+        <tr style="${mealTo.isExcess() ? 'color:red;' : 'color:green;'}" >
+            <td>${mealTo.getDate()}  ${mealTo.getTime()}</td>
+            <td>${mealTo.getDescription()}</td>
+            <td>${mealTo.getCalories()}</td>
             <td><a href="">update</a></td>
             <td><a href="">delete</a></td>
         </tr>

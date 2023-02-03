@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.slf4j.Logger;
 import ru.javawebinar.topjava.storage.MealStorage;
 import ru.javawebinar.topjava.storage.MemoryMealStorage;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -12,10 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalTime;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class MealServlet extends HttpServlet {
 
     private MealStorage mealStorage;
-    final int CALORIESPERDAY = 2000;
+    private final int CALORIES_PER_DAY = 2000;
+    private static final Logger log = getLogger(MealServlet.class);
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -25,10 +29,9 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("mealsTo", MealsUtil.filteredByStreams(mealStorage.getAll(),
-                LocalTime.of(0, 0),
-                LocalTime.of(23, 59),
-                CALORIESPERDAY));
+        request.setAttribute("mealsTo", MealsUtil.filteredByStreams(mealStorage.getAll(), LocalTime.MIN, LocalTime.MAX,
+                CALORIES_PER_DAY));
+        log.debug("forward to meals");
         request.getRequestDispatcher("meals.jsp").forward(request, response);
     }
 
