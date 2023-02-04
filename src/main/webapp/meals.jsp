@@ -11,8 +11,10 @@
 
 <body>
 <h3><a href="index.html">Home</a></h3>
+<a href="meals?id=${"new"}&action=edit">Add Meal</a>
 <table>
     <tr>
+        <th>id</th>
         <th>Date</th>
         <th>Description</th>
         <th>Calories</th>
@@ -22,11 +24,12 @@
     <c:forEach items="${mealsTo}" var="mealTo">
         <jsp:useBean id="mealTo" type="ru.javawebinar.topjava.model.MealTo "/>
         <tr style="${mealTo.isExcess() ? 'color:red;' : 'color:green;'}" >
+            <td>${mealTo.getId()}</td>
             <td>${mealTo.getDate()}  ${mealTo.getTime()}</td>
             <td>${mealTo.getDescription()}</td>
             <td>${mealTo.getCalories()}</td>
-            <td><a href="">update</a></td>
-            <td><a href="">delete</a></td>
+            <td><a href="meals?id=${mealTo.getId()}&action=edit">update</a></td>
+            <td><a href="meals?id=${mealTo.getId()}&action=delete">delete</a></td>
         </tr>
     </c:forEach>
 </table>
