@@ -11,7 +11,7 @@
 
 <body>
 <h3><a href="index.html">Home</a></h3>
-<a href="meals?id=${"new"}&action=edit">Add Meal</a>
+<a href="meals?id=${"new"}&action=new">Add Meal</a>
 <table>
     <tr>
         <th>id</th>
@@ -23,13 +23,13 @@
     </tr>
     <c:forEach items="${mealsTo}" var="mealTo">
         <jsp:useBean id="mealTo" type="ru.javawebinar.topjava.model.MealTo "/>
-        <tr style="${mealTo.isExcess() ? 'color:red;' : 'color:green;'}" >
-            <td>${mealTo.getId()}</td>
+        <tr style="color: ${mealTo.excess ? 'red;' : 'green;'}" >
+            <td>${mealTo.id}</td>
             <td>${mealTo.getDate()}  ${mealTo.getTime()}</td>
-            <td>${mealTo.getDescription()}</td>
-            <td>${mealTo.getCalories()}</td>
-            <td><a href="meals?id=${mealTo.getId()}&action=edit">update</a></td>
-            <td><a href="meals?id=${mealTo.getId()}&action=delete">delete</a></td>
+            <td>${mealTo.description}</td>
+            <td>${mealTo.calories}</td>
+            <td><a href="meals?id=${mealTo.id}&action=edit">update</a></td>
+            <td><a href="meals?id=${mealTo.id}&action=delete">delete</a></td>
         </tr>
     </c:forEach>
 </table>

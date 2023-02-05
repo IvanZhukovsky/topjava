@@ -1,33 +1,28 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: zhukovsky
-  Date: 03.02.2023
-  Time: 23:08
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html>
 <head>
-    <title>Title</title>
+    <title>Meal</title>
 </head>
 <body>
 <section>
     <form method="post" action="meals" enctype="application/x-www-form-urlencoded">
-        <h2>Edit meal</h2>
-        <input type="hidden" name="id" value="${meal.getId()}">
+
+        <h2>${head}</h2>
+
+        <input type="hidden" name="id" value="${meal.id}">
         <table>
             <tr>
                 <td>Date Time:</td>
-                <td><input type="datetime-local" name="dateTime" value="${meal.getDateTime()}"></td>
+                <td><input type="datetime-local" name="dateTime" value="${head.equals("Edit meal") ? meal.getDateTime() : now}"></td>
             </tr>
             <tr>
                 <td width="150">Description:</td>
-                <td><input type="text" name="description" value="${meal.getDescription()}"></td>
+                <td><input type="text" name="description" value="${meal.description}"></td>
             </tr>
             <tr>
-                <td>Calorites:</td>
-                <td><input type="text" name="calories" value="${meal.getCalories()}"></td>
+                <td>Calories:</td>
+                <td><input type="text" name="calories" value="${meal.calories}"></td>
             </tr>
         </table>
         <button type="submit">Save</button>

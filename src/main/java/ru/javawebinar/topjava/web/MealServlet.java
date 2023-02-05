@@ -20,9 +20,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
 
-    private MealStorage mealStorage;
-    private final int CALORIES_PER_DAY = 2000;
     private static final Logger log = getLogger(MealServlet.class);
+    private MealStorage mealStorage;
+    static final int CALORIES_PER_DAY = 2000;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -32,7 +32,6 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
         String action = request.getParameter("action");
 
         if (action == null) {
@@ -42,23 +41,32 @@ public class MealServlet extends HttpServlet {
             request.getRequestDispatcher("meals.jsp").forward(request, response);
             return;
         }
-        Meal meal = null;
+        String header = "";
         switch (action) {
             case "delete":
-                log.debug("сработала команда на удаление от id = " + id );
+                String id = request.getParameter("id");
                 mealStorage.delete(Integer.parseInt(id));
+                log.debug("delete meal with id {}", id);
                 response.sendRedirect("meals");
                 return;
             case "edit":
-                if (id.equals("new")) {
-                    log.debug(id);
-                    //meal = new Meal(LocalDateTime.now(), "", 0);
-                } else {
-                    meal = mealStorage.get(Integer.parseInt(id));
-                }
+                header = "Edit meal";
+                id = request.getParameter("id");
+                Meal meal = mealStorage.get(Integer.parseInt(id));
+                log.debug("edit meal with id {}", id);
+                request.setAttribute("meal", meal);
                 break;
+            case "new":
+                header = "Add meal";
+                log.debug("add form opened");
+                break;
+            default:
+                request.getRequestDispatcher("meals.jsp").forward(request, response);
         }
-        request.setAttribute("meal", meal);
+        LocalDateTime now = LocalDateTime.now().withNano(0).withSecond(0);
+        now.format(DateTimeFormatter.ISO_DATE_TIME);
+        request.setAttribute("now", now);
+        request.setAttribute("head", header);
         request.getRequestDispatcher("edit.jsp").forward(request, response);
     }
 
@@ -69,23 +77,20 @@ public class MealServlet extends HttpServlet {
         String dateTime = request.getParameter("dateTime");
         String description = request.getParameter("description");
         String calories = request.getParameter("calories");
-
+        if (!calories.chars().allMatch(Character::isDigit)) {
+            calories = "0";
+        }
         if (id.isEmpty()) {
             mealStorage.create(parseDate(dateTime), description, Integer.parseInt(calories));
+            log.debug("Add new meal with date&time {} description {} calories {}", dateTime, description, calories);
         } else {
             mealStorage.update(Integer.parseInt(id), parseDate(dateTime), description, Integer.parseInt(calories));
+            log.debug("Edit new meal with id {} date&time {} description {} calories {}", id, dateTime, description, calories);
         }
-        log.debug("id= " + id);
-        log.debug(dateTime);
-        log.debug(description);
-        log.debug(calories);
-
         response.sendRedirect("meals");
     }
 
     private LocalDateTime parseDate(String dateTime) {
-        String dateTimePattern = "yyyy-MM-dd HH:mm";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
-        return LocalDateTime.parse(dateTime.replace("T", " "), dateTimeFormatter);
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_DATE_TIME).withSecond(0).withNano(0);
     }
 }

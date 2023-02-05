@@ -2,17 +2,17 @@ package ru.javawebinar.topjava.storage;
 
 import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface MealStorage {
 
-    void update(Integer id, LocalDateTime dateTime, String description, int calories);
+    Meal update(int id, LocalDateTime dateTime, String description, int calories);
 
-    void create(LocalDateTime dateTime, String description, int calories);
+    Meal create(LocalDateTime dateTime, String description, int calories);
 
-    Meal get(Integer id);
+    Meal get(int id);
 
-    void delete(Integer id);
+    void delete(int id);
 
-    List<Meal> getAll();
+    CopyOnWriteArrayList<Meal> getAll();
 }

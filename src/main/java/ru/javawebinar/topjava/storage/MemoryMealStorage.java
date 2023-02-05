@@ -5,55 +5,70 @@ import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemoryMealStorage implements MealStorage{
+public class MemoryMealStorage implements MealStorage {
 
-    private static Integer countId = -1;
+    private int countId = -1;
 
-    private final List<Meal> mealStorage = new ArrayList<>(Arrays.asList(
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-            new Meal(getNextId(), LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-    ));
+    private final CopyOnWriteArrayList<Meal> storage = new CopyOnWriteArrayList<>();
+
+    {
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500);
+        this.create(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410);
+    }
 
     @Override
-    public void update(Integer id, LocalDateTime dateTime, String description, int calories) {
+    public synchronized Meal update(int id, LocalDateTime dateTime, String description, int calories) {
         int index = 0;
-        for (int i = 0; i < mealStorage.size(); i++) {
-            if (Objects.equals(mealStorage.get(i).getId(), id)) {
+        for (int i = 0; i < storage.size(); i++) {
+            if (storage.get(i).getId() == id) {
                 index = i;
+                Meal meal = new Meal(id, dateTime, description, calories);
+                storage.set(index, meal);
+                return meal;
             }
         }
-        mealStorage.set(index, new Meal(id, dateTime, description, calories));
+        return null;
     }
 
     @Override
-    public void create(LocalDateTime dateTime, String description, int calories) {
-        mealStorage.add(new Meal(getNextId(), dateTime, description, calories));
+    public Meal create(LocalDateTime dateTime, String description, int calories) {
+        Meal meal = new Meal(getNextId(), dateTime, description, calories);
+        storage.add(meal);
+        return meal;
     }
 
     @Override
-    public Meal get(Integer id) {
-        Optional<Meal> mealOptional= mealStorage.stream().filter(meal -> Objects.equals(meal.getId(), id)).findFirst();
-        return mealOptional.isPresent() ? mealOptional.get() : null;
+    public Meal get(int id) {
+        Optional<Meal> mealOptional = storage.stream().filter(meal -> Objects.equals(meal.getId(), id)).findFirst();
+        return mealOptional.orElse(null);
     }
 
     @Override
-    public void delete(Integer id) {
-        mealStorage.removeIf(meal -> Objects.equals(meal.getId(), id));
+    public void delete(int id) {
+        for (int i = 0; i < storage.size(); i++) {
+            if (storage.get(i).getId() == id) {
+                storage.remove(i);
+                break;
+            }
+        }
     }
 
     @Override
-    public List<Meal> getAll() {
-        return mealStorage;
+    public CopyOnWriteArrayList<Meal> getAll() {
+        return new CopyOnWriteArrayList<>(storage);
     }
 
-    public static synchronized Integer  getNextId(){
-        countId++;
+    private synchronized int getNextId() {
+        AtomicInteger atomicInteger = new AtomicInteger(countId);
+        countId = atomicInteger.incrementAndGet();
         return countId;
     }
 
