@@ -3,7 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.storage.MealStorage;
-import ru.javawebinar.topjava.storage.MemoryMealStorage;
+import ru.javawebinar.topjava.storage.MemoryMapMealStorage;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletConfig;
@@ -27,7 +27,8 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        mealStorage = new MemoryMealStorage();
+        //mealStorage = new MemoryMealStorage();
+        mealStorage = new MemoryMapMealStorage();
     }
 
     @Override
@@ -77,9 +78,7 @@ public class MealServlet extends HttpServlet {
         String dateTime = request.getParameter("dateTime");
         String description = request.getParameter("description");
         String calories = request.getParameter("calories");
-        if (!calories.chars().allMatch(Character::isDigit)) {
-            calories = "0";
-        }
+
         if (id.isEmpty()) {
             mealStorage.create(parseDate(dateTime), description, Integer.parseInt(calories));
             log.debug("Add new meal with date&time {} description {} calories {}", dateTime, description, calories);

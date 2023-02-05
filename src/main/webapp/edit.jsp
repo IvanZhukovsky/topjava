@@ -22,7 +22,7 @@
             </tr>
             <tr>
                 <td>Calories:</td>
-                <td><input type="text" name="calories" value="${meal.calories}"></td>
+                <td><input type="number" name="calories" value="${meal.calories}"></td>
             </tr>
         </table>
         <button type="submit">Save</button>

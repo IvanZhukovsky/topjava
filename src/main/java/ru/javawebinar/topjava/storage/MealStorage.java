@@ -2,7 +2,7 @@ package ru.javawebinar.topjava.storage;
 
 import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDateTime;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 public interface MealStorage {
 
@@ -14,5 +14,5 @@ public interface MealStorage {
 
     void delete(int id);
 
-    CopyOnWriteArrayList<Meal> getAll();
+    List<Meal> getAll();
 }

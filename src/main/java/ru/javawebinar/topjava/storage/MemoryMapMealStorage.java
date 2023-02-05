@@ -4,15 +4,16 @@ import ru.javawebinar.topjava.model.Meal;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MemoryMealStorage implements MealStorage {
+public class MemoryMapMealStorage implements MealStorage {
 
     private int countId = -1;
 
-    private final CopyOnWriteArrayList<Meal> storage = new CopyOnWriteArrayList<>();
+    private final ConcurrentHashMap<Integer, Meal> storage= new ConcurrentHashMap<>();
 
     {
         this.create(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500);
@@ -26,45 +27,32 @@ public class MemoryMealStorage implements MealStorage {
 
     @Override
     public synchronized Meal update(int id, LocalDateTime dateTime, String description, int calories) {
-        int index = 0;
-        for (int i = 0; i < storage.size(); i++) {
-            if (storage.get(i).getId() == id) {
-                index = i;
-                Meal meal = new Meal(id, dateTime, description, calories);
-                storage.set(index, meal);
-                return meal;
-            }
-        }
-        return null;
+        Meal meal = new Meal(id, dateTime, description, calories);
+        storage.put(id, meal);
+        return meal;
     }
 
     @Override
     public Meal create(LocalDateTime dateTime, String description, int calories) {
         int id = getNextId();
         Meal meal = new Meal(id, dateTime, description, calories);
-        storage.add(meal);
+        storage.put(id, meal);
         return meal;
     }
 
     @Override
     public Meal get(int id) {
-        Optional<Meal> mealOptional = storage.stream().filter(meal -> Objects.equals(meal.getId(), id)).findFirst();
-        return mealOptional.orElse(null);
+        return storage.get(id);
     }
 
     @Override
     public void delete(int id) {
-        for (int i = 0; i < storage.size(); i++) {
-            if (storage.get(i).getId() == id) {
-                storage.remove(i);
-                break;
-            }
-        }
+        storage.remove(id);
     }
 
     @Override
     public List<Meal> getAll() {
-        return new ArrayList<>(storage);
+        return new ArrayList<>(storage.values());
     }
 
     private synchronized int getNextId() {
