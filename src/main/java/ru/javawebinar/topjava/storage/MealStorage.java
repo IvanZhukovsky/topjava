@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface MealStorage {
 
-    Meal update(int id, LocalDateTime dateTime, String description, int calories);
+    Meal update(Meal meal);
 
-    Meal create(LocalDateTime dateTime, String description, int calories);
+    Meal create(Meal meal);
 
     Meal get(int id);
 

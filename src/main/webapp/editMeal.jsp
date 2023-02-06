@@ -8,13 +8,13 @@
 <section>
     <form method="post" action="meals" enctype="application/x-www-form-urlencoded">
 
-        <h2>${head}</h2>
+        <h2>${meal == null ? "Add meal" : "Edit meal"}</h2>
 
         <input type="hidden" name="id" value="${meal.id}">
         <table>
             <tr>
                 <td>Date Time:</td>
-                <td><input type="datetime-local" name="dateTime" value="${head.equals("Edit meal") ? meal.getDateTime() : now}"></td>
+                <td><input type="datetime-local" name="dateTime" value="${meal == null ? now : meal.getDateTime()}"></td>
             </tr>
             <tr>
                 <td width="150">Description:</td>
