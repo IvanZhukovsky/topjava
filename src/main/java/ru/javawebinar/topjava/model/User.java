@@ -21,7 +21,7 @@ public class User extends AbstractNamedEntity {
     private int caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
 
     public User(String name, String email, String password, Role... roles) {
-        this(null, name, email, password, DEFAULT_CALORIES_PER_DAY, true, Arrays.asList(roles));
+        this(null, name, email, password, roles);
     }
 
     public User(Integer id, String name, String email, String password, Role... roles) {
@@ -38,7 +38,7 @@ public class User extends AbstractNamedEntity {
     }
 
     public String getEmail() {
-        return email;
+        return email.toLowerCase();
     }
 
     public void setEmail(String email) {

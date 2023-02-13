@@ -19,7 +19,7 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(meal -> save(SecurityUtil.authUserId(), meal));
+        MealsUtil.meals.forEach(meal -> save(1, meal));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class InMemoryMealRepository implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
-        if (isBelongUserId(meal.getId(), userId)) {
+        if (!isBelongUserId(meal.getId(), userId)) {
             return null;
         }
         // handle case: update, but not present in storage
@@ -39,7 +39,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int userId, int id) {
-        if (isBelongUserId(id, userId)) {
+        if (!isBelongUserId(id, userId)) {
             return false;
         }
         return repository.remove(id) != null;
@@ -47,19 +47,28 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal get(int userId, int id) {
-        if (isBelongUserId(id, userId)) {
+        Meal meal = repository.get(id);
+        if (!isBelongUserId(meal, userId)) {
             return null;
         }
-        return repository.get(id);
+        return meal;
     }
 
     @Override
     public List<Meal> getAll() {
-        return repository.values().stream().sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
+        return repository.values()
+                .stream()
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                .collect(Collectors.toList());
     }
 
     private boolean isBelongUserId(int id, int userId) {
-        return !repository.get(id).getUserId().equals(userId);
+        return repository.get(id).getUserId().equals(userId);
     }
+
+    private boolean isBelongUserId(Meal meal, Integer userId) {
+        return meal.getUserId().equals(userId);
+    }
+
 }
 
