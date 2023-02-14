@@ -1,4 +1,3 @@
-<%@ page import="ru.javawebinar.topjava.web.SecurityUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -24,11 +23,10 @@
     <h2>Meals</h2>
 <%--    <jsp:useBean id="filter" type="ru.javawebinar.topjava.model.DateTimeFilter"/>--%>
     <form method="post" action="meals?action=filter">
-        <h1>${userId}</h1>
         <input type="date" value="${filter.startDate}" name="startDate">
         <input type="date" value="${filter.endDate}" name="endDate">
-        <input type="time" value="${filter.startTime}" name="startTime">
-        <input type="time" value="${filter.endTime}" name="endTime">
+        <input type="time" value="${filter.startTime}" name="startTime" placeholder="">
+        <input type="time" value="${filter.endTime}" name="endTime" placeholder="">
         <button type="submit">Filter</button>
 
     </form>
@@ -54,7 +52,7 @@
                         <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
                         ${fn:formatDateTime(meal.dateTime)}
                 </td>
-                <td>${meal.description}</td>
+                <td>${meal.description} userId = ${userId}</td>
                 <td>${meal.calories}</td>
                 <td><a href="meals?action=update&id=${meal.id}">Update</a></td>
                 <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>

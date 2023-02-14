@@ -43,13 +43,13 @@ public class MealRestController {
 
     public List<MealTo> getAll() {
         log.info("getAll");
-        return MealsUtil.getTos(service.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY);
+        return MealsUtil.getTos(service.getAll(SecurityUtil.authUserId()), MealsUtil.DEFAULT_CALORIES_PER_DAY);
     }
 
     public List<MealTo> getAllFiltered() {
         log.info("getAllFiltered");
 
-        List<MealTo> mealTos = MealsUtil.getFilteredTos(service.getAll(),
+        List<MealTo> mealTos = MealsUtil.getFilteredTos(service.getAll(SecurityUtil.authUserId()),
                 MealsUtil.DEFAULT_CALORIES_PER_DAY,
                 dateTimeFilter.getStartTime() == null ? LocalTime.MIN : dateTimeFilter.getStartTime(),
                 dateTimeFilter.getEndTime() == null ? LocalTime.MAX : dateTimeFilter.getEndTime());

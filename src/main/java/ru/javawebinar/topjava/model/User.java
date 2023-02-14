@@ -38,7 +38,7 @@ public class User extends AbstractNamedEntity {
     }
 
     public String getEmail() {
-        return email.toLowerCase();
+        return email;
     }
 
     public void setEmail(String email) {
