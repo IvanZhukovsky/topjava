@@ -11,8 +11,6 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
     public static final int ID = START_SEQ + 4;
-    public static final int USER_ID_2 = START_SEQ + 1;
-    public static final int USER_ID_NOT_FOUND = START_SEQ + 200;
 
     public static final Meal meal = new Meal(ID, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000);
 
