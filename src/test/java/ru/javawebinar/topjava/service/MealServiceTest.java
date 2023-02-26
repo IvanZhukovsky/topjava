@@ -1,11 +1,14 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Ignore;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
-import org.junit.rules.TestName;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,6 +20,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -29,32 +33,37 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@Ignore
 public class MealServiceTest {
 
     @Autowired
     private MealService service;
-    private long start;
-    private long startAllTests;
-    private long endAllTests;
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final StringBuilder totalElapsedLog = new StringBuilder();
+    private static long totalElapsed;
 
-    @Rule
-    public final TestName name = new TestName();
-    @Rule
-    public final ExternalResource resource = new ExternalResource() {
-
+    @ClassRule
+    public static ExternalResource externalResource = new ExternalResource() {
         @Override
         protected void before() throws Throwable {
-            start = System.nanoTime();
-        };
-
+            totalElapsedLog.append("\n\n");
+            totalElapsed = 0;
+        }
         @Override
         protected void after() {
-            long finish = System.nanoTime();
-            long elapsed = finish - start;
-            System.out.println(name.getMethodName());
-            System.out.println("Время теста в мс - " + elapsed/1000000);
-        };
+            log.info(totalElapsedLog.toString() + "\n" + "Total test execution time - " + this.getClass() + " - " + totalElapsed + " ms\n");
+        }
+    };
+
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            long elapsed = TimeUnit.NANOSECONDS.toMillis(nanos);
+            totalElapsed = totalElapsed + elapsed;
+            String elapsedLog = description.getDisplayName() + "   -    " + elapsed + " ms";
+            log.info(elapsedLog);
+            totalElapsedLog.append(elapsedLog).append('\n');
+        }
     };
 
     @Test
