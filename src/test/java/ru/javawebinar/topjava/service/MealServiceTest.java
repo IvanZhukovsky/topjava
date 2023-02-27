@@ -35,32 +35,32 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-    private static final StringBuilder totalElapsedLog = new StringBuilder();
-    @Autowired
-    private MealService service;
-
     @ClassRule
     public static ExternalResource externalResource = new ExternalResource() {
         @Override
         protected void before() throws Throwable {
             totalElapsedLog.append("\n\n");
         }
+
         @Override
         protected void after() {
             log.info(totalElapsedLog + "\n");
         }
     };
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final StringBuilder totalElapsedLog = new StringBuilder();
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            String elapsedLog = String.format("%-75s %7d", description.getDisplayName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+            String elapsedLog = String.format("%-75s %7d ms", description.getDisplayName(), TimeUnit.NANOSECONDS.toMillis(nanos));
             log.info(elapsedLog + "ms");
-            totalElapsedLog.append(elapsedLog).append(" ms").append('\n');
+            totalElapsedLog.append(elapsedLog).append('\n');
         }
     };
+    @Autowired
+    private MealService service;
 
     @Test
     public void delete() {
