@@ -35,22 +35,20 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    @Autowired
-    private MealService service;
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
     private static final StringBuilder totalElapsedLog = new StringBuilder();
-    private static long totalElapsed;
+    @Autowired
+    private MealService service;
 
     @ClassRule
     public static ExternalResource externalResource = new ExternalResource() {
         @Override
         protected void before() throws Throwable {
             totalElapsedLog.append("\n\n");
-            totalElapsed = 0;
         }
         @Override
         protected void after() {
-            log.info(totalElapsedLog.toString() + "\n" + "Total test execution time - " + this.getClass() + " - " + totalElapsed + " ms\n");
+            log.info(totalElapsedLog + "\n");
         }
     };
 
@@ -58,11 +56,9 @@ public class MealServiceTest {
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            long elapsed = TimeUnit.NANOSECONDS.toMillis(nanos);
-            totalElapsed = totalElapsed + elapsed;
-            String elapsedLog = description.getDisplayName() + "   -    " + elapsed + " ms";
-            log.info(elapsedLog);
-            totalElapsedLog.append(elapsedLog).append('\n');
+            String elapsedLog = String.format("%-75s %7d", description.getDisplayName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+            log.info(elapsedLog + "ms");
+            totalElapsedLog.append(elapsedLog).append(" ms").append('\n');
         }
     };
 
