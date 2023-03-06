@@ -84,8 +84,6 @@ public abstract class MealServiceTest extends ServiceTest {
 
     @Test
     public void getAll() {
-//        service.delete(100011, 100001);
-//        service.delete(100010, 100001);
         MEAL_MATCHER.assertMatch(service.getAll(USER_ID), meals);
     }
 
