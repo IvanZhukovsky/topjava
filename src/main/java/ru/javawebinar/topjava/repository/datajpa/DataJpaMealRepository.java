@@ -34,13 +34,16 @@ public class DataJpaMealRepository implements MealRepository {
         return crudRepository.delete(id, userId) != 0;
     }
 
+//    @Transactional
     @Override
     public Meal get(int id, int userId) {
         Meal meal = crudRepository.findById(id).orElse(null);
         if (meal == null || meal.getUser().getId() != userId) {
             return null;
+        } else {
+            meal.setUser(crudUserRepository.findById(userId).orElse(null));
+            return meal;
         }
-        return meal;
     }
 
     @Override
