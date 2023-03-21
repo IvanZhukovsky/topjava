@@ -1,14 +1,12 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.web.meal.AbstractMealController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
@@ -21,33 +19,30 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
+@RequestMapping(value = "/meals")
 public class JspMealController extends AbstractMealController {
-    private static final Logger log = LoggerFactory.getLogger(JspMealController.class);
 
-    @GetMapping("/meals")
-    public String getMeals(Model model) {
+    @GetMapping()
+    public String getAll(HttpServletRequest request, Model model) {
         log.info("meals");
-        model.addAttribute("meals", getAll());
+        String action = request.getParameter("action");
+        if (StringUtils.hasLength(action)) {
+            LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
+            LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
+            LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
+            LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
+            model.addAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
+        } else {
+            model.addAttribute("meals", getAll());
+        }
         return "meals";
     }
 
     @GetMapping("/delete")
     public String delete(HttpServletRequest request) {
         log.info("meal delete");
-        int id = Integer.parseInt(request.getParameter("id"));
-        delete(id);
-        return "redirect:meals";
-    }
-
-    @PostMapping("/filter")
-    public String filter(HttpServletRequest request, Model model) {
-        log.info("meal filter");
-        LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
-        LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
-        LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
-        LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        model.addAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
-        return "meals";
+        delete(getId(request));
+        return "redirect:/meals";
     }
 
     @GetMapping("/mealForm")
@@ -56,18 +51,16 @@ public class JspMealController extends AbstractMealController {
         if (StringUtils.hasLength(request.getParameter("id"))) {
             log.info("mealForm edit");
             meal = get(getId(request));
-            model.addAttribute("action", "edit");}
-        else {
+        } else {
             log.info("mealForm create");
             meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-            model.addAttribute("action", "create");
         }
         model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @PostMapping("/save")
-    public String create(HttpServletRequest request){
+    @PostMapping("/mealForm/save")
+    public String CreateOrUpdate(HttpServletRequest request) {
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
@@ -77,20 +70,11 @@ public class JspMealController extends AbstractMealController {
         } else {
             create(meal);
         }
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
     }
-
-
-
-
-
-
-
-
-
 }
